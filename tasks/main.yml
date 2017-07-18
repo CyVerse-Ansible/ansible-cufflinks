@@ -1,0 +1,36 @@
+---
+
+- name: Download binary tarball
+  get_url:
+    url: "http://cole-trapnell-lab.github.io/cufflinks/assets/downloads/cufflinks-{{ VERSION }}.Linux_x86_64.tar.gz"
+    dest: "/tmp/cufflinks.tar.gz"
+
+- name: Extract tarball
+  unarchive:
+    src: "/tmp/cufflinks.tar.gz"
+    dest: "/tmp"
+    remote_src: yes
+
+- name: Move executables to path
+  copy:
+    remote_src: yes
+    src: "/tmp/cufflinks-{{ VERSION }}.Linux_x86_64/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    mode: 0755
+  with_items:
+    - "cuffcompare"
+    - "cuffdiff"
+    - "cufflinks"
+    - "cuffmerge"
+    - "cuffnorm"
+    - "cuffquant"
+    - "gffread"
+    - "gtf_to_sam"
+
+- name: Remove temporary files
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items:
+    - "/tmp/cufflinks.tar.gz"
+    - "/tmp/cufflinks-{{ VERSION }}.Linux_x86_64"
